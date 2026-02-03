@@ -10,7 +10,34 @@ LifeKanban is a personal life event management web application with Kanban board
 
 ## Version History
 
-### v1.1.0 - Design System Overhaul (Current)
+### v1.1.1 - Production Deployment (Current)
+**Date:** February 3, 2026
+**Milestone:** Successfully deployed to Vercel with CI/CD
+
+**Deployment Achievements:**
+- Fixed TypeScript build errors (6 files)
+- Configured Vercel deployment with `vercel.json`
+- Set up GitHub repository: `aayancheng/lifekanban`
+- Established continuous deployment pipeline
+- Production URL: Vercel-hosted application
+- Automatic deployments on push to `main` branch
+
+**Technical Fixes:**
+- Removed unused imports across components
+- Fixed Domain type comparisons in KanbanBoard
+- Corrected localStorage StorageKey types
+- Fixed timeout type from `NodeJS.Timeout` to `ReturnType<typeof setTimeout>`
+- Updated `.vercelignore` to exclude only development files
+
+**Infrastructure:**
+- GitHub: https://github.com/aayancheng/lifekanban
+- Vercel: Auto-deployment on commit
+- Client-side routing configured with rewrites
+- Asset caching (1-year) and security headers enabled
+
+---
+
+### v1.1.0 - Design System Overhaul
 **Date:** January 28, 2026
 **Design Skill Applied:** `frontend-design` plugin
 
@@ -117,6 +144,229 @@ npm run build        # Build for production
 npm run preview      # Preview production build
 npm run lint         # Run ESLint
 ```
+
+---
+
+## Deployment to Vercel
+
+The project is configured and ready for deployment to Vercel. All TypeScript build errors have been resolved and necessary configuration files are in place.
+
+### Prerequisites
+
+**Required Tools:**
+```bash
+# Vercel CLI (for Option A)
+npm install -g vercel
+
+# Git (should already be installed)
+git --version
+
+# GitHub CLI (for Option B - optional)
+brew install gh
+gh auth login
+```
+
+### Deployment Configuration Files
+
+The following files are already configured:
+
+- **`vercel.json`** - Vercel deployment configuration
+  - Client-side routing rewrites (serves `index.html` for all routes)
+  - Asset caching headers (1-year cache for static assets)
+  - Security headers (XSS protection, clickjacking prevention)
+
+- **`.vercelignore`** - Optimizes deployment by excluding unnecessary files
+  - Excludes `node_modules`, `dist`, `src`, and development files
+
+- **`.gitignore`** - Includes `.vercel` directory to exclude Vercel CLI configs
+
+### Option A: Quick Deploy with Vercel CLI
+
+**Best for:** Fast deployment, testing, or one-time deployments
+
+```bash
+# 1. Login to Vercel
+vercel login
+# Choose authentication method (Email, GitHub, or GitLab)
+
+# 2. Deploy to preview environment
+vercel
+# Answer prompts:
+#   - Set up and deploy? → Y
+#   - Which scope? → [Your account]
+#   - Link to existing project? → N
+#   - Project name? → lifekanban
+#   - Code directory? → ./ (press Enter)
+#   - Override settings? → N
+
+# 3. Test the preview URL provided
+# Visit the URL and test all functionality
+
+# 4. Deploy to production
+vercel --prod
+```
+
+**Result:** Production URL like `https://lifekanban.vercel.app`
+
+**Useful CLI Commands:**
+```bash
+vercel ls                    # List all deployments
+vercel logs [url]            # View deployment logs
+vercel promote [url]         # Promote deployment to production
+vercel domains               # Manage custom domains
+vercel env                   # Manage environment variables
+```
+
+### Option B: GitHub Integration (Recommended)
+
+**Best for:** Continuous deployment, team collaboration, automatic previews
+
+**Step 1: Create GitHub Repository**
+
+Using GitHub CLI:
+```bash
+# Create and push to GitHub
+gh repo create lifekanban --public --source=. --remote=origin
+git push -u origin main
+```
+
+Or manually:
+```bash
+# Create repository at https://github.com/new
+git remote add origin https://github.com/YOUR_USERNAME/lifekanban.git
+git branch -M main
+git push -u origin main
+```
+
+**Step 2: Connect Vercel to GitHub**
+
+1. Go to https://vercel.com/new
+2. Click "Import Git Repository"
+3. Select your GitHub account (install Vercel app if first time)
+4. Choose the `lifekanban` repository
+5. Verify auto-detected settings:
+   - Framework Preset: **Vite**
+   - Root Directory: `./`
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+6. Click **Deploy**
+
+**Step 3: Automatic Deployment Workflow**
+
+Once connected, Vercel automatically:
+- **Production deployments**: Triggered on push to `main` branch
+- **Preview deployments**: Created for every pull request
+- **Unique URLs**: Each commit gets its own preview URL
+
+**Future workflow:**
+```bash
+# Make changes
+git add .
+git commit -m "Add new feature"
+git push origin main
+
+# Vercel automatically builds and deploys
+# Deployment notifications sent via email/Slack
+```
+
+### Post-Deployment Testing
+
+**Critical Routes to Test:**
+```
+https://lifekanban.vercel.app/              # Dashboard
+https://lifekanban.vercel.app/board         # All domains Kanban
+https://lifekanban.vercel.app/board/health  # Health domain
+https://lifekanban.vercel.app/board/family  # Family domain
+https://lifekanban.vercel.app/board/learning # Learning domain
+```
+
+**Testing Checklist:**
+- [ ] All routes load without 404 errors (client-side routing works)
+- [ ] Create new task (modal opens, form validates, saves)
+- [ ] Edit existing task
+- [ ] Delete task with confirmation
+- [ ] Drag and drop tasks between columns
+- [ ] Start/stop time tracker
+- [ ] localStorage persists after page refresh
+- [ ] Keyboard shortcuts work (n, d, k, ?, Esc, Ctrl/Cmd+Z)
+- [ ] Custom fonts load (Fraunces for headings, DM Sans for body)
+- [ ] Domain colors display correctly
+- [ ] Responsive layout on mobile devices
+- [ ] No console errors in browser DevTools
+
+**Performance Validation:**
+1. Run Lighthouse audit in Chrome DevTools
+2. Target scores: Performance >90, Accessibility >90, Best Practices >90
+3. Check Network tab for proper asset caching
+
+### Troubleshooting
+
+**Issue: 404 on Direct Route Access**
+- **Symptom:** Visiting `/board/health` directly returns 404
+- **Solution:** Verify `vercel.json` has `rewrites` configuration, redeploy
+
+**Issue: Fonts Not Loading**
+- **Symptom:** System fonts appear instead of Fraunces/DM Sans
+- **Solution:** Check Network tab - Google Fonts should load from CDN (configured in `src/index.css`)
+
+**Issue: localStorage Not Working**
+- **Symptom:** Tasks disappear after refresh
+- **Cause:** Browser localStorage disabled (user browser setting)
+- **Note:** Not a deployment issue - this is browser-specific
+
+**Issue: Build Fails on Vercel**
+- **Symptom:** Deployment fails with TypeScript errors
+- **Solution:** Run `npm run build` locally first to catch errors before deploying
+
+### Rollback Strategy
+
+**Quick Rollback via Vercel Dashboard:**
+1. Go to Vercel Dashboard → Deployments
+2. Find previous working deployment
+3. Click "..." → "Promote to Production"
+
+**Via CLI:**
+```bash
+vercel ls                    # List deployments
+vercel promote [old-url]     # Promote specific deployment
+```
+
+**Via Git:**
+```bash
+git revert HEAD
+git push origin main
+# Vercel auto-deploys reverted version
+```
+
+### Custom Domain Setup (Optional)
+
+**Add Custom Domain:**
+1. Go to Vercel Dashboard → Project Settings → Domains
+2. Click "Add Domain"
+3. Enter your domain (e.g., `lifekanban.com`)
+4. Configure DNS records:
+   ```
+   A     @    76.76.21.21
+   CNAME www  cname.vercel-dns.com
+   ```
+5. Wait for DNS propagation (up to 48 hours, usually <1 hour)
+6. SSL certificate auto-provisioned by Vercel (Let's Encrypt)
+
+### Build Information
+
+**Current Build Output:**
+- **CSS Bundle:** 31.62 KB (6.21 KB gzipped)
+- **JS Bundle:** 246.15 KB (77.31 KB gzipped)
+- **Build Time:** ~500ms
+- **Total Files:** 3 (index.html + CSS + JS)
+
+**Optimization Notes:**
+- Asset caching configured for 1 year (`max-age=31536000`)
+- Security headers enabled (XSS, clickjacking protection)
+- Vite automatically code-splits and tree-shakes
+- Google Fonts loaded from CDN with `display=swap`
+
+---
 
 ## Development Phases
 
@@ -422,3 +672,106 @@ When adding backend, implement a migration utility to:
 4. Add sync mechanism for subsequent changes
 
 Keep localStorage logic isolated in custom hooks to make backend integration easier.
+
+---
+
+## Enhancement Todos (Post-Deployment)
+
+### Immediate Quick Wins
+- [ ] **Add Favicon**: Replace default Vite icon with custom LifeKanban logo
+- [ ] **Add README.md**: Project overview, features, tech stack, and demo link
+- [ ] **Add LICENSE**: Choose appropriate license (MIT recommended)
+- [ ] **Add Screenshot**: Capture app screenshot for GitHub repository
+- [ ] **Update Page Title**: Add dynamic titles per route (Dashboard, Health Board, etc.)
+- [ ] **Add Loading State**: Show skeleton while app initializes
+- [ ] **Add Error Boundary**: Catch and display React errors gracefully
+- [ ] **Add Toast Notifications**: Success/error feedback for actions (task created, deleted, etc.)
+
+### Performance Optimizations
+- [ ] **Lazy Load Routes**: Code-split Dashboard and KanbanBoard with React.lazy()
+- [ ] **Optimize Bundle Size**: Analyze with `npm run build -- --mode analyze`
+- [ ] **Add Service Worker**: Enable offline functionality with Vite PWA plugin
+- [ ] **Optimize Fonts**: Self-host Fraunces and DM Sans instead of Google CDN
+- [ ] **Add Image Optimization**: If adding images, use WebP format
+- [ ] **Implement Virtual Scrolling**: For large task lists (react-window)
+
+### User Experience Enhancements
+- [ ] **Add Dark Mode**: Implement theme toggle with localStorage persistence
+- [ ] **Add Keyboard Navigation**: Arrow keys to navigate tasks, Enter to edit
+- [ ] **Add Bulk Actions**: Select multiple tasks for batch delete/move
+- [ ] **Add Task Filtering**: Quick filters for "Due Today", "Overdue", "High Priority"
+- [ ] **Add Task Sorting**: Sort by due date, priority, or creation date
+- [ ] **Add Completed Tasks Archive**: Separate view for completed tasks
+- [ ] **Add Task Notes**: Rich text notes field for detailed task information
+- [ ] **Add Task Tags**: Custom tags/labels for better organization
+- [ ] **Add Color Themes per Domain**: Customizable color schemes
+- [ ] **Add Confetti Animation**: Celebrate task completion
+
+### Data Management
+- [ ] **Add Data Export**: Download tasks as JSON or CSV
+- [ ] **Add Data Import**: Upload tasks from JSON file
+- [ ] **Add Data Backup Reminder**: Prompt user to backup weekly
+- [ ] **Add Storage Usage Indicator**: Show localStorage capacity used
+- [ ] **Add Data Clear with Confirmation**: Clear all data with double confirmation
+- [ ] **Add Sample Data Generator**: Load demo tasks for new users
+
+### Analytics & Insights
+- [ ] **Add Time Tracking Dashboard**: Visualize time spent per domain
+- [ ] **Add Productivity Trends**: Charts showing task completion over time
+- [ ] **Add Weekly Summary**: Email-like summary of week's accomplishments
+- [ ] **Add Streak Counter**: Track consecutive days of task completion
+- [ ] **Add Domain Balance**: Visual indicator of time distribution across domains
+- [ ] **Add Goal Progress**: Show percentage toward weekly/monthly goals
+
+### Mobile & Accessibility
+- [ ] **Add Touch Gestures**: Swipe to complete/delete on mobile
+- [ ] **Add Mobile-Optimized Layout**: Simplified UI for small screens
+- [ ] **Add ARIA Labels**: Screen reader support for all interactive elements
+- [ ] **Add Focus Indicators**: Clear visual focus for keyboard navigation
+- [ ] **Add Color Contrast Check**: Ensure WCAG AA compliance
+- [ ] **Add Reduced Motion Option**: Respect prefers-reduced-motion
+
+### Developer Experience
+- [ ] **Add Pre-commit Hooks**: Run ESLint and type-check before commit (husky)
+- [ ] **Add Unit Tests**: Jest/Vitest for utility functions
+- [ ] **Add Component Tests**: React Testing Library for components
+- [ ] **Add E2E Tests**: Playwright for critical user flows
+- [ ] **Add CI/CD Pipeline**: GitHub Actions for automated testing
+- [ ] **Add Code Coverage**: Track test coverage with codecov
+- [ ] **Add Changelog**: Automated changelog from commit messages
+- [ ] **Add Contribution Guide**: CONTRIBUTING.md for open source contributors
+
+### SEO & Marketing
+- [ ] **Add Meta Tags**: Open Graph and Twitter Card for social sharing
+- [ ] **Add Sitemap**: Generate sitemap.xml for search engines
+- [ ] **Add Robots.txt**: Configure search engine crawling
+- [ ] **Add Google Analytics**: Track user behavior (with consent)
+- [ ] **Add Landing Page**: Marketing page explaining features
+- [ ] **Add Demo Video**: Screen recording showing app features
+- [ ] **Add Blog Post**: Write about building the app
+
+### Integration Ideas
+- [ ] **Add Calendar Sync**: Export tasks to Google Calendar/iCal
+- [ ] **Add Notion Integration**: Sync tasks with Notion database
+- [ ] **Add Slack Notifications**: Daily task reminders via Slack
+- [ ] **Add Email Reminders**: Send due date reminders via email
+- [ ] **Add GitHub Integration**: Create tasks from GitHub issues
+- [ ] **Add API**: RESTful API for programmatic access
+
+### Advanced Features (Phase 2+)
+- [ ] **Add Recurring Tasks**: Schedule tasks to repeat (daily, weekly, etc.)
+- [ ] **Add Sub-tasks**: Break down tasks into smaller steps with checkboxes
+- [ ] **Add Task Dependencies**: Block tasks until prerequisites complete
+- [ ] **Add Time Estimates**: Estimate task duration and compare to actual
+- [ ] **Add Pomodoro Timer**: Built-in Pomodoro technique timer
+- [ ] **Add Focus Mode**: Distraction-free single-task view
+- [ ] **Add Collaboration**: Share boards with family/team members
+- [ ] **Add Real-time Sync**: Multi-device synchronization with backend
+
+### Documentation Improvements
+- [ ] **Add API Documentation**: Document component props and hooks
+- [ ] **Add Architecture Diagram**: Visual representation of app structure
+- [ ] **Add Tutorial**: Interactive first-time user guide
+- [ ] **Add FAQ**: Common questions and troubleshooting
+- [ ] **Add Video Walkthrough**: Screen recording with narration
+- [ ] **Add Deployment Guide**: Step-by-step deployment to other platforms
