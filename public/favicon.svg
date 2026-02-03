@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background -->
+  <rect width="32" height="32" rx="6" fill="#FAF8F5"/>
+
+  <!-- Health Column (Green) -->
+  <rect x="4" y="6" width="6" height="20" rx="1.5" fill="#059669"/>
+  <rect x="4.5" y="7" width="5" height="3" rx="0.5" fill="#D1FAE5"/>
+  <rect x="4.5" y="11" width="5" height="4" rx="0.5" fill="#D1FAE5"/>
+  <rect x="4.5" y="16.5" width="5" height="2.5" rx="0.5" fill="#D1FAE5"/>
+
+  <!-- Family Column (Blue) -->
+  <rect x="13" y="6" width="6" height="20" rx="1.5" fill="#2563EB"/>
+  <rect x="13.5" y="7" width="5" height="4" rx="0.5" fill="#DBEAFE"/>
+  <rect x="13.5" y="12.5" width="5" height="2.5" rx="0.5" fill="#DBEAFE"/>
+  <rect x="13.5" y="16.5" width="5" height="3.5" rx="0.5" fill="#DBEAFE"/>
+
+  <!-- Learning Column (Violet) -->
+  <rect x="22" y="6" width="6" height="20" rx="1.5" fill="#7C3AED"/>
+  <rect x="22.5" y="7" width="5" height="2.5" rx="0.5" fill="#EDE9FE"/>
+  <rect x="22.5" y="10.5" width="5" height="3.5" rx="0.5" fill="#EDE9FE"/>
+  <rect x="22.5" y="15.5" width="5" height="4" rx="0.5" fill="#EDE9FE"/>
+</svg>
