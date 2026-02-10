@@ -1,6 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
 import { RefObject } from 'react'
 
+const DOMAIN_LINKS = [
+  { path: '/', label: 'All', color: '#1A1814' },
+  { path: '/health', label: 'Health', color: '#059669' },
+  { path: '/family', label: 'Family', color: '#2563EB' },
+  { path: '/learning', label: 'Learning', color: '#7C3AED' },
+]
+
 interface NavigationProps {
   searchInputRef?: RefObject<HTMLInputElement>
 }
@@ -9,10 +16,7 @@ export default function Navigation({ searchInputRef }: NavigationProps) {
   const location = useLocation()
 
   const isActive = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/'
-    }
-    return location.pathname.startsWith(path)
+    return location.pathname === path
   }
 
   return (
@@ -40,30 +44,28 @@ export default function Navigation({ searchInputRef }: NavigationProps) {
               </div>
             </Link>
 
-            {/* Navigation Links */}
-            <div className="flex items-center space-x-1">
-              <Link
-                to="/"
-                className={`nav-link ${isActive('/') && !isActive('/board') ? 'active' : ''}`}
-              >
-                <span className="flex items-center space-x-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                  </svg>
-                  <span>Dashboard</span>
-                </span>
-              </Link>
-              <Link
-                to="/board"
-                className={`nav-link ${isActive('/board') ? 'active' : ''}`}
-              >
-                <span className="flex items-center space-x-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-                  </svg>
-                  <span>Boards</span>
-                </span>
-              </Link>
+            {/* Domain Quick-Links */}
+            <div className="flex items-center space-x-1 p-1 bg-white/60 backdrop-blur-sm rounded-2xl border border-ink-900/5">
+              {DOMAIN_LINKS.map((link) => {
+                const active = isActive(link.path)
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      active
+                        ? 'bg-ink-900 text-white shadow-sm'
+                        : 'text-ink-500 hover:text-ink-700 hover:bg-ink-100/50'
+                    }`}
+                  >
+                    <div
+                      className="w-2 h-2 rounded-full transition-colors"
+                      style={{ backgroundColor: active ? '#fff' : link.color }}
+                    />
+                    <span>{link.label}</span>
+                  </Link>
+                )
+              })}
             </div>
           </div>
 

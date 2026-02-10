@@ -81,29 +81,24 @@ export function useGlobalShortcuts(
       callback: onShowHelp,
     },
     {
-      key: 'd',
-      description: 'Go to Dashboard',
-      callback: () => navigate('/'),
-    },
-    {
       key: 'k',
-      description: 'Go to Kanban board',
-      callback: () => navigate('/board'),
+      description: 'Go to All Tasks board',
+      callback: () => navigate('/'),
     },
     {
       key: 'h',
       description: 'Switch to Health board',
-      callback: () => navigate('/board/health'),
+      callback: () => navigate('/health'),
     },
     {
       key: 'f',
       description: 'Switch to Family board',
-      callback: () => navigate('/board/family'),
+      callback: () => navigate('/family'),
     },
     {
       key: 'l',
       description: 'Switch to Learning board',
-      callback: () => navigate('/board/learning'),
+      callback: () => navigate('/learning'),
     },
   ]
 

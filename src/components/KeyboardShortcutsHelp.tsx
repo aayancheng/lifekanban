@@ -8,8 +8,7 @@ interface KeyboardShortcutsHelpProps {
 
 const shortcuts = [
   { category: 'Navigation', items: [
-    { keys: ['D'], description: 'Go to Dashboard' },
-    { keys: ['K'], description: 'Go to Kanban boards' },
+    { keys: ['K'], description: 'Go to All Tasks board' },
     { keys: ['H'], description: 'Switch to Health board' },
     { keys: ['F'], description: 'Switch to Family board' },
     { keys: ['L'], description: 'Switch to Learning board' },

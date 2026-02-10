@@ -1,4 +1,5 @@
 import { ReactNode, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 interface ModalProps {
   isOpen: boolean
@@ -23,18 +24,18 @@ export default function Modal({ isOpen, onClose, title, children, footer }: Moda
 
   if (!isOpen) return null
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="fixed inset-0 bg-black bg-opacity-50 animate-backdrop-in"
         onClick={onClose}
       />
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div
-          className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full"
+          className="relative bg-white rounded-lg shadow-xl max-w-3xl w-full animate-modal-in"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -65,4 +66,6 @@ export default function Modal({ isOpen, onClose, title, children, footer }: Moda
       </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }
