@@ -4,6 +4,7 @@ import { HistoryProvider } from './contexts/HistoryContext'
 import { TimeTrackingProvider } from './contexts/TimeTrackingContext'
 import Layout from './components/Layout'
 import KanbanBoard from './features/kanban/KanbanBoard'
+import ErrorBoundary from './components/ErrorBoundary'
 
 function BoardRedirect() {
   const { domain } = useParams<{ domain?: string }>()
@@ -12,21 +13,23 @@ function BoardRedirect() {
 
 function App() {
   return (
-    <Router>
-      <HistoryProvider>
-        <TasksProvider>
-          <TimeTrackingProvider>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<KanbanBoard />} />
-                <Route path="/:domain" element={<KanbanBoard />} />
-                <Route path="/board/:domain?" element={<BoardRedirect />} />
-              </Routes>
-            </Layout>
-          </TimeTrackingProvider>
-        </TasksProvider>
-      </HistoryProvider>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <HistoryProvider>
+          <TasksProvider>
+            <TimeTrackingProvider>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<ErrorBoundary><KanbanBoard /></ErrorBoundary>} />
+                  <Route path="/:domain" element={<ErrorBoundary><KanbanBoard /></ErrorBoundary>} />
+                  <Route path="/board/:domain?" element={<BoardRedirect />} />
+                </Routes>
+              </Layout>
+            </TimeTrackingProvider>
+          </TasksProvider>
+        </HistoryProvider>
+      </Router>
+    </ErrorBoundary>
   )
 }
 

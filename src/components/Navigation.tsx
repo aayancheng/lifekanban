@@ -1,5 +1,5 @@
-import { Link, useLocation } from 'react-router-dom'
-import { RefObject } from 'react'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
+import { RefObject, useRef } from 'react'
 
 const DOMAIN_LINKS = [
   { path: '/', label: 'All', color: '#1A1814' },
@@ -14,9 +14,77 @@ interface NavigationProps {
 
 export default function Navigation({ searchInputRef }: NavigationProps) {
   const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
 
-  const isActive = (path: string) => {
-    return location.pathname === path
+  const isActive = (path: string) => location.pathname === path
+
+  const searchValue = searchParams.get('q') ?? ''
+
+  const handleSearchChange = (value: string) => {
+    clearTimeout(searchTimeoutRef.current)
+    searchTimeoutRef.current = setTimeout(() => {
+      if (value) {
+        setSearchParams({ q: value }, { replace: true })
+      } else {
+        setSearchParams({}, { replace: true })
+      }
+    }, 150)
+  }
+
+  const handleExport = () => {
+    const tasksRaw = localStorage.getItem('lifekanban_tasks')
+    const historyRaw = localStorage.getItem('lifekanban_history')
+    const historyIndexRaw = localStorage.getItem('lifekanban_history_index')
+
+    const backup = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      data: {
+        tasks: tasksRaw ? JSON.parse(tasksRaw) : [],
+        history: historyRaw ? JSON.parse(historyRaw) : [],
+        historyIndex: historyIndexRaw ? JSON.parse(historyIndexRaw) : -1,
+      },
+    }
+
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `lifekanban-backup-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string)
+        if (!Array.isArray(json?.data?.tasks)) {
+          alert('Invalid backup file: missing tasks array.')
+          return
+        }
+        localStorage.setItem('lifekanban_tasks', JSON.stringify(json.data.tasks))
+        if (Array.isArray(json.data.history)) {
+          localStorage.setItem('lifekanban_history', JSON.stringify(json.data.history))
+        }
+        if (json.data.historyIndex !== undefined) {
+          localStorage.setItem('lifekanban_history_index', JSON.stringify(json.data.historyIndex))
+        }
+        window.location.reload()
+      } catch {
+        alert('Failed to read backup file. Make sure it is a valid LifeKanban export.')
+      }
+    }
+    reader.readAsText(file)
+    // Reset so the same file can be re-imported if needed
+    e.target.value = ''
   }
 
   return (
@@ -33,7 +101,6 @@ export default function Navigation({ searchInputRef }: NavigationProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 </div>
-                {/* Subtle glow on hover */}
                 <div className="absolute inset-0 rounded-xl bg-accent/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
 
@@ -69,8 +136,9 @@ export default function Navigation({ searchInputRef }: NavigationProps) {
             </div>
           </div>
 
-          {/* Search */}
-          <div className="flex items-center">
+          {/* Right side: Search + Export/Import */}
+          <div className="flex items-center gap-3">
+            {/* Search */}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <svg className="w-4 h-4 text-ink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,6 +149,8 @@ export default function Navigation({ searchInputRef }: NavigationProps) {
                 ref={searchInputRef}
                 type="text"
                 placeholder="Search tasks..."
+                defaultValue={searchValue}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="input pl-11 pr-12 py-2.5 w-72 text-sm"
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -88,6 +158,29 @@ export default function Navigation({ searchInputRef }: NavigationProps) {
                   /
                 </kbd>
               </div>
+            </div>
+
+            {/* Export / Import */}
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={handleExport}
+                title="Export all tasks as JSON backup"
+                className="btn-secondary text-xs px-2.5 py-1.5"
+              >
+                Export
+              </button>
+              <label
+                title="Import tasks from a JSON backup"
+                className="btn-secondary text-xs px-2.5 py-1.5 cursor-pointer"
+              >
+                Import
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImport}
+                  className="sr-only"
+                />
+              </label>
             </div>
           </div>
         </div>
