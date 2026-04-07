@@ -2,6 +2,7 @@ import { ReactNode, useState, useRef } from 'react'
 import Navigation from './Navigation'
 import KeyboardShortcutsHelp from './KeyboardShortcutsHelp'
 import TaskModal from '../features/tasks/TaskModal'
+import InstallPrompt from './InstallPrompt'
 import { useGlobalShortcuts } from '../hooks/useKeyboardShortcuts'
 
 interface LayoutProps {
@@ -25,7 +26,6 @@ export default function Layout({ children }: LayoutProps) {
     setIsHelpModalOpen(true)
   }
 
-  // Setup global keyboard shortcuts
   useGlobalShortcuts(handleNewTask, handleSearchFocus, handleShowHelp)
 
   return (
@@ -38,6 +38,9 @@ export default function Layout({ children }: LayoutProps) {
       {/* Global Modals */}
       <TaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} />
       <KeyboardShortcutsHelp isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />
+
+      {/* PWA install banner */}
+      <InstallPrompt />
     </div>
   )
 }
