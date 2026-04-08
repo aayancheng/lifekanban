@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, TouchSensor, useSensor, useSensors, rectIntersection } from '@dnd-kit/core'
 import { useTasks } from '../../contexts/TasksContext'
 import { Domain, TaskStatus, Task } from '../../types'
@@ -60,9 +60,21 @@ export default function KanbanBoard() {
     })
   )
 
-  const filteredTasks = selectedDomain === 'all'
-    ? tasks
-    : tasks.filter(task => task.domain === selectedDomain)
+  const [searchParams] = useSearchParams()
+  const searchQuery = (searchParams.get('q') ?? '').toLowerCase()
+
+  const filteredTasks = (() => {
+    const byDomain = selectedDomain === 'all'
+      ? tasks
+      : tasks.filter(task => task.domain === selectedDomain)
+
+    if (!searchQuery) return byDomain
+
+    return byDomain.filter(task =>
+      task.title.toLowerCase().includes(searchQuery) ||
+      (task.description?.toLowerCase().includes(searchQuery) ?? false)
+    )
+  })()
 
   // Stats calculations
   const todoCount = filteredTasks.filter(t => t.status === 'todo').length
