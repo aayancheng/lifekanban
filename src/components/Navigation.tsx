@@ -1,5 +1,5 @@
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
-import { RefObject, useRef } from 'react'
+import { RefObject, useRef, useState } from 'react'
 
 const DOMAIN_LINKS = [
   { path: '/', label: 'All', color: '#1A1814' },
@@ -16,6 +16,7 @@ export default function Navigation({ searchInputRef }: NavigationProps) {
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const isActive = (path: string) => location.pathname === path
 
@@ -88,57 +89,52 @@ export default function Navigation({ searchInputRef }: NavigationProps) {
   }
 
   return (
-    <nav className="sticky top-0 z-40 backdrop-blur-xl bg-cream-50/80 border-b border-ink-900/5">
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
+    <nav className="sticky top-0 z-40 backdrop-blur-xl bg-cream-50/80 border-b border-ink-900/5 safe-area-top">
+      <div className="container mx-auto px-4 sm:px-6">
+        {/* Main nav row */}
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo & Brand */}
-          <div className="flex items-center space-x-10">
-            <Link to="/" className="flex items-center space-x-3 group">
-              {/* Logo Mark */}
-              <div className="relative">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-ink-900 to-ink-700 flex items-center justify-center shadow-soft group-hover:shadow-soft-lg transition-shadow">
-                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                </div>
-                <div className="absolute inset-0 rounded-xl bg-accent/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Link to="/" className="flex items-center space-x-2.5 group shrink-0">
+            <div className="relative">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-ink-900 to-ink-700 flex items-center justify-center shadow-soft group-hover:shadow-soft-lg transition-shadow">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
               </div>
-
-              {/* Brand Name */}
-              <div className="font-display">
-                <span className="text-xl font-semibold text-ink-900">Life</span>
-                <span className="text-xl font-semibold text-accent">Kanban</span>
-              </div>
-            </Link>
-
-            {/* Domain Quick-Links */}
-            <div className="flex items-center space-x-1 p-1 bg-white/60 backdrop-blur-sm rounded-2xl border border-ink-900/5">
-              {DOMAIN_LINKS.map((link) => {
-                const active = isActive(link.path)
-                return (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      active
-                        ? 'bg-ink-900 text-white shadow-sm'
-                        : 'text-ink-500 hover:text-ink-700 hover:bg-ink-100/50'
-                    }`}
-                  >
-                    <div
-                      className="w-2 h-2 rounded-full transition-colors"
-                      style={{ backgroundColor: active ? '#fff' : link.color }}
-                    />
-                    <span>{link.label}</span>
-                  </Link>
-                )
-              })}
+              <div className="absolute inset-0 rounded-xl bg-accent/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
+            <div className="font-display">
+              <span className="text-lg sm:text-xl font-semibold text-ink-900">Life</span>
+              <span className="text-lg sm:text-xl font-semibold text-accent">Kanban</span>
+            </div>
+          </Link>
+
+          {/* Desktop: Domain Quick-Links */}
+          <div className="hidden md:flex items-center space-x-1 p-1 bg-white/60 backdrop-blur-sm rounded-2xl border border-ink-900/5">
+            {DOMAIN_LINKS.map((link) => {
+              const active = isActive(link.path)
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    active
+                      ? 'bg-ink-900 text-white shadow-sm'
+                      : 'text-ink-500 hover:text-ink-700 hover:bg-ink-100/50'
+                  }`}
+                >
+                  <div
+                    className="w-2 h-2 rounded-full transition-colors"
+                    style={{ backgroundColor: active ? '#fff' : link.color }}
+                  />
+                  <span>{link.label}</span>
+                </Link>
+              )
+            })}
           </div>
 
-          {/* Right side: Search + Export/Import */}
-          <div className="flex items-center gap-3">
-            {/* Search */}
+          {/* Desktop: Search + Export/Import */}
+          <div className="hidden md:flex items-center gap-3">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <svg className="w-4 h-4 text-ink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,8 +155,6 @@ export default function Navigation({ searchInputRef }: NavigationProps) {
                 </kbd>
               </div>
             </div>
-
-            {/* Export / Import */}
             <div className="flex items-center gap-1.5">
               <button
                 onClick={handleExport}
@@ -183,6 +177,116 @@ export default function Navigation({ searchInputRef }: NavigationProps) {
               </label>
             </div>
           </div>
+
+          {/* Mobile: Search icon + hamburger */}
+          <div className="flex md:hidden items-center gap-2">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-xl text-ink-500 hover:text-ink-700 hover:bg-ink-100/50 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile expanded menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden pb-3 space-y-3 border-t border-ink-900/5 pt-3">
+            {/* Mobile search */}
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg className="w-4 h-4 text-ink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Search tasks..."
+                defaultValue={searchValue}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="input pl-11 py-2.5 w-full text-sm"
+              />
+            </div>
+
+            {/* Mobile domain links */}
+            <div className="flex items-center space-x-1 p-1 bg-white/60 backdrop-blur-sm rounded-2xl border border-ink-900/5">
+              {DOMAIN_LINKS.map((link) => {
+                const active = isActive(link.path)
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex-1 flex items-center justify-center space-x-1.5 px-2 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      active
+                        ? 'bg-ink-900 text-white shadow-sm'
+                        : 'text-ink-500 hover:text-ink-700 hover:bg-ink-100/50'
+                    }`}
+                  >
+                    <div
+                      className="w-2 h-2 rounded-full shrink-0"
+                      style={{ backgroundColor: active ? '#fff' : link.color }}
+                    />
+                    <span>{link.label}</span>
+                  </Link>
+                )
+              })}
+            </div>
+
+            {/* Mobile Export/Import */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleExport}
+                className="btn-secondary flex-1 text-sm py-2"
+              >
+                Export Backup
+              </button>
+              <label className="btn-secondary flex-1 text-sm py-2 cursor-pointer text-center">
+                Import Backup
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImport}
+                  className="sr-only"
+                />
+              </label>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile bottom domain bar (always visible, no menu needed) */}
+      <div className="md:hidden border-t border-ink-900/5">
+        <div className="flex items-center px-2 py-1.5 gap-1">
+          {DOMAIN_LINKS.map((link) => {
+            const active = isActive(link.path)
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 ${
+                  active
+                    ? 'bg-ink-900 text-white'
+                    : 'text-ink-500 hover:text-ink-700'
+                }`}
+              >
+                <div
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{ backgroundColor: active ? '#fff' : link.color }}
+                />
+                <span>{link.label}</span>
+              </Link>
+            )
+          })}
         </div>
       </div>
     </nav>

@@ -36,6 +36,15 @@
 
   html {
     scroll-behavior: smooth;
+    /* Prevent address bar resize from causing layout jumps on mobile */
+    height: 100%;
+  }
+
+  /* Support for Android notch / safe areas */
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .safe-area-top {
+      padding-top: env(safe-area-inset-top);
+    }
   }
 
   body {
