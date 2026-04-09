@@ -121,28 +121,28 @@ export default function KanbanBoard() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header with Stats */}
-      <div className="flex items-end justify-between">
-        <div className="space-y-1">
-          <h1 className="font-display text-4xl font-semibold text-ink-900">
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-1 min-w-0">
+          <h1 className="font-display text-2xl sm:text-4xl font-semibold text-ink-900 truncate">
             {selectedDomain === 'all' ? 'All Tasks' : `${selectedDomain.charAt(0).toUpperCase() + selectedDomain.slice(1)} Board`}
           </h1>
           {/* Compact Stats Bar */}
-          <div className="flex items-center space-x-4 mt-2">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
             <span className="flex items-center space-x-1.5 text-sm text-ink-500">
-              <span className="w-2 h-2 rounded-full bg-ink-300" />
+              <span className="w-2 h-2 rounded-full bg-ink-300 shrink-0" />
               <span>{todoCount} to do</span>
             </span>
             <span className="flex items-center space-x-1.5 text-sm text-blue-600">
-              <span className="w-2 h-2 rounded-full bg-blue-500" />
+              <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
               <span>{inProgressCount} in progress</span>
             </span>
             <span className="flex items-center space-x-1.5 text-sm text-emerald-600">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
               <span>{doneCount} done</span>
             </span>
             {totalSeconds > 0 && (
               <span className="flex items-center space-x-1.5 text-sm text-accent">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span>{formatDuration(totalSeconds)}</span>
@@ -152,7 +152,7 @@ export default function KanbanBoard() {
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="btn-primary flex items-center space-x-2"
+          className="btn-primary flex items-center space-x-2 shrink-0"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
